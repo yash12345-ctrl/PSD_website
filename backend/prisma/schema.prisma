@@ -1,0 +1,33 @@
+// Prisma Schema for Principles of Sustainable Development Student Submissions
+// Local SQL Database Engine
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Submission {
+  id             String   @id @default(uuid())
+  refId          String   @unique
+  name           String
+  regNo          String
+  section        String?
+  email          String?
+  principle      String?
+  originalWork   Boolean  @default(false)
+  assignmentPath String?
+  assignmentName String?
+  assignmentSize Int?
+  reportPath     String?
+  reportName     String?
+  reportSize     Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([regNo])
+  @@index([section])
+}

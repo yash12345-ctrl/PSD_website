@@ -1,0 +1,11 @@
+# Local SQL Database files & journals
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# Keep folder structure tracked
+!.gitkeep
+!.gitignore
