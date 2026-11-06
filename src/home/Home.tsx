@@ -10,13 +10,8 @@ const COURSE_NAME = 'Principles of Sustainable Development'
 const DAY_MS = 86_400_000
 const WINDOW_OPENS = new Date('2026-10-15T00:00:00')
 
-// Final deadline is set to tomorrow at 12:00 PM
-const FINAL_DEADLINE = (() => {
-  const d = new Date()
-  d.setDate(d.getDate() + 1)
-  d.setHours(12, 0, 0, 0)
-  return d
-})()
+// Final deadline: 9 November at 11:59 PM
+const FINAL_DEADLINE = new Date('2026-11-09T23:59:00')
 
 const KEY_DATES = [
   {
@@ -27,7 +22,7 @@ const KEY_DATES = [
   {
     date: FINAL_DEADLINE,
     title: 'Final submission',
-    detail: 'Upload your assignment report and poster by 12:00 PM.',
+    detail: 'Upload your assignment report and poster by 11:59 PM.',
   },
   {
     date: new Date(FINAL_DEADLINE.getTime() + 5 * DAY_MS),
@@ -102,7 +97,15 @@ export default function Home({ onOpenSubmit, onOpenAdmin: _onOpenAdmin }: HomePr
   const [theme, setTheme] = useState<'light' | 'dark'>(() =>
     window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
   )
-  const [now] = useState(() => Date.now())
+  const [now, setNow] = useState(() => Date.now())
+
+  /* Live countdown clock updates every 1 second */
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(Date.now())
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [])
 
   /* Theme */
   useEffect(() => {
@@ -131,13 +134,16 @@ export default function Home({ onOpenSubmit, onOpenAdmin: _onOpenAdmin }: HomePr
     return () => observer.disconnect()
   }, [])
 
-  /* Submission window */
+  /* Submission window & live remaining time */
   const opens = WINDOW_OPENS.getTime()
   const closes = FINAL_DEADLINE.getTime()
   const phase: 'upcoming' | 'open' | 'closed' = now < opens ? 'upcoming' : now > closes ? 'closed' : 'open'
   const msLeft = Math.max(0, closes - now)
-  const hoursLeft = Math.floor(msLeft / (1000 * 60 * 60))
-  const daysLeft = Math.max(0, Math.ceil(msLeft / DAY_MS))
+  const totalSeconds = Math.floor(msLeft / 1000)
+  const daysLeft = Math.floor(totalSeconds / 86400)
+  const hoursLeft = Math.floor((totalSeconds % 86400) / 3600)
+  const minutesLeft = Math.floor((totalSeconds % 3600) / 60)
+  const secondsLeft = totalSeconds % 60
   const progress = Math.min(1, Math.max(0, (now - opens) / (closes - opens)))
   const nextIndex = KEY_DATES.findIndex(d => d.date.getTime() >= now)
   const nextDate = nextIndex >= 0 ? KEY_DATES[nextIndex] : null
@@ -230,20 +236,36 @@ export default function Home({ onOpenSubmit, onOpenAdmin: _onOpenAdmin }: HomePr
                   <span className="live-dot" />
                   {phaseLabel}
                 </span>
-                <span className="status-close">Due Tomorrow · 12:00 PM</span>
+                <span className="status-close">
+                  {phase === 'closed' ? 'Closed 9 Nov · 11:59 PM' : 'Due 9 Nov · 11:59 PM'}
+                </span>
               </div>
 
               <div className="status-count">
-                <strong>{phase === 'closed' ? 0 : (hoursLeft > 24 ? daysLeft : Math.max(1, hoursLeft))}</strong>
-                <span>
-                  {phase === 'closed'
-                    ? 'Closed'
-                    : hoursLeft > 24
-                      ? (daysLeft === 1 ? 'day left' : 'days left')
-                      : (hoursLeft <= 1 ? 'hour left' : 'hours left')}
-                </span>
+                <strong>{phase === 'closed' ? 0 : daysLeft > 0 ? daysLeft : hoursLeft}</strong>
+                <div className="status-count-sub">
+                  <span className="status-count-unit">
+                    {phase === 'closed'
+                      ? 'Closed'
+                      : daysLeft > 0
+                        ? (daysLeft === 1 ? 'day left' : 'days left')
+                        : hoursLeft > 0
+                          ? (hoursLeft === 1 ? 'hour left' : 'hours left')
+                          : (minutesLeft === 1 ? 'minute left' : 'minutes left')}
+                  </span>
+                  {phase === 'open' && (
+                    <span className="status-count-timer" title="Live countdown">
+                      {daysLeft > 0 && `${daysLeft}d `}
+                      {String(hoursLeft % 24).padStart(2, '0')}h {String(minutesLeft).padStart(2, '0')}m {String(secondsLeft).padStart(2, '0')}s
+                    </span>
+                  )}
+                </div>
               </div>
-              <p className="status-caption">Final submission closes tomorrow at 12:00 PM</p>
+              <p className="status-caption">
+                {phase === 'closed'
+                  ? 'Submissions are officially closed.'
+                  : 'Final submission closes 9 Nov at 11:59 PM'}
+              </p>
 
               <div className="progress" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100}>
                 <span style={{ width: `${progress * 100}%` }} />
