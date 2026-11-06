@@ -144,7 +144,6 @@ export default function Home({ onOpenSubmit, onOpenAdmin: _onOpenAdmin }: HomePr
   const hoursLeft = Math.floor((totalSeconds % 86400) / 3600)
   const minutesLeft = Math.floor((totalSeconds % 3600) / 60)
   const secondsLeft = totalSeconds % 60
-  const progress = Math.min(1, Math.max(0, (now - opens) / (closes - opens)))
   const nextIndex = KEY_DATES.findIndex(d => d.date.getTime() >= now)
   const nextDate = nextIndex >= 0 ? KEY_DATES[nextIndex] : null
 
@@ -266,14 +265,6 @@ export default function Home({ onOpenSubmit, onOpenAdmin: _onOpenAdmin }: HomePr
                   ? 'Submissions are officially closed.'
                   : 'Final submission closes 9 Nov at 11:59 PM'}
               </p>
-
-              <div className="progress" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100}>
-                <span style={{ width: `${progress * 100}%` }} />
-              </div>
-              <div className="status-meta">
-                <span>Opened {formatShortDate(WINDOW_OPENS)}</span>
-                <span>{Math.round(progress * 100)}% elapsed</span>
-              </div>
 
               {nextDate && (
                 <div className="status-next">
