@@ -409,3 +409,62 @@ export const viewSubmissionFile = async (req, res, next) => {
     next(error)
   }
 }
+
+/**
+ * Controller: Delete a submission record and its associated physical files
+ * DELETE /api/submissions/:id
+ */
+export const deleteSubmission = async (req, res, next) => {
+  try {
+    const { id } = req.params
+
+    const rawSubmission = await prisma.submission.findUnique({
+      where: { id },
+    })
+
+    if (!rawSubmission) {
+      return res.status(404).json({ success: false, message: 'Submission not found.' })
+    }
+
+    const submission = decryptSubmissionRecord(rawSubmission)
+
+    // Remove assignment file from disk if present
+    if (submission.assignmentPath) {
+      const resolvedAssignment = path.resolve(submission.assignmentPath)
+      if (resolvedAssignment.startsWith(uploadBaseDir) && fs.existsSync(resolvedAssignment)) {
+        try {
+          fs.unlinkSync(resolvedAssignment)
+        } catch (e) {
+          console.error('Failed to unlink assignment file:', e.message)
+        }
+      }
+    }
+
+    // Remove report/poster file from disk if present
+    if (submission.reportPath) {
+      const resolvedReport = path.resolve(submission.reportPath)
+      if (resolvedReport.startsWith(uploadBaseDir) && fs.existsSync(resolvedReport)) {
+        try {
+          fs.unlinkSync(resolvedReport)
+        } catch (e) {
+          console.error('Failed to unlink report file:', e.message)
+        }
+      }
+    }
+
+    // Delete record from database
+    await prisma.submission.delete({
+      where: { id },
+    })
+
+    invalidateSubmissionsCache()
+
+    return res.status(200).json({
+      success: true,
+      message: 'Submission and deliverables deleted successfully.',
+      id,
+    })
+  } catch (error) {
+    next(error)
+  }
+}

@@ -90,6 +90,44 @@ export default function AdminDashboard({
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedSection, setSelectedSection] = useState('ALL')
   const [previewData, setPreviewData] = useState<PreviewModalData | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  const handleDelete = async (sub: SubmissionRecord) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to permanently delete the submission for "${sub.name}" (${sub.regNo})?\n\nThis will remove the record and permanently delete uploaded files from disk. This cannot be undone.`
+    )
+    if (!confirmed) return
+
+    setDeletingId(sub.id)
+    try {
+      const token = getAuthToken()
+      const response = await fetch(`${API_BASE_URL}/submissions/${sub.id}`, {
+        method: 'DELETE',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+
+      if (response.status === 401) {
+        onLogout()
+        return
+      }
+
+      const json = await response.json()
+      if (!response.ok || !json.success) {
+        throw new Error(json.message || 'Failed to delete submission.')
+      }
+
+      setSubmissions((prev) => {
+        const next = prev.filter((item) => item.id !== sub.id)
+        saveSubmissionsToCache(next)
+        return next
+      })
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Error deleting submission.'
+      alert(msg)
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   const handleOpenPreview = (sub: SubmissionRecord, fileType: 'assignment' | 'poster') => {
     setPreviewData({ isOpen: true, submission: sub, fileType })
@@ -509,6 +547,7 @@ export default function AdminDashboard({
                       <th>Assignment</th>
                       <th>Poster</th>
                       <th>Submitted</th>
+                      <th style={{ textAlign: 'center', width: '90px' }}>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -691,6 +730,30 @@ export default function AdminDashboard({
                             <span>{formatDate(sub.createdAt)}</span>
                           </div>
                         </td>
+
+                        {/* Action - Delete */}
+                        <td style={{ textAlign: 'center' }}>
+                          <button
+                            type="button"
+                            className="row-delete-btn"
+                            onClick={() => handleDelete(sub)}
+                            disabled={deletingId === sub.id}
+                            title={`Delete submission of ${sub.name}`}
+                            aria-label={`Delete submission of ${sub.name}`}
+                          >
+                            {deletingId === sub.id ? (
+                              <span className="btn-spinner-mini" />
+                            ) : (
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                <line x1="10" y1="11" x2="10" y2="17" />
+                                <line x1="14" y1="11" x2="14" y2="17" />
+                              </svg>
+                            )}
+                            <span>{deletingId === sub.id ? 'Deleting...' : 'Delete'}</span>
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -818,6 +881,26 @@ export default function AdminDashboard({
                         )}
                       </div>
                     </div>
+
+                    <button
+                      type="button"
+                      className="mobile-card-delete-btn"
+                      onClick={() => handleDelete(sub)}
+                      disabled={deletingId === sub.id}
+                      title={`Delete submission for ${sub.name}`}
+                    >
+                      {deletingId === sub.id ? (
+                        <span className="btn-spinner-mini" />
+                      ) : (
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          <line x1="10" y1="11" x2="10" y2="17" />
+                          <line x1="14" y1="11" x2="14" y2="17" />
+                        </svg>
+                      )}
+                      <span>{deletingId === sub.id ? 'Deleting...' : 'Delete Submission'}</span>
+                    </button>
                   </div>
                 ))}
               </div>

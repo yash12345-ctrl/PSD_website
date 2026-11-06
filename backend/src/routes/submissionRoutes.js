@@ -1,10 +1,11 @@
-  import { Router } from 'express'
+import { Router } from 'express'
 import {
   createSubmission,
   getAllSubmissions,
   getSubmissionById,
   downloadSubmissionFile,
   viewSubmissionFile,
+  deleteSubmission,
 } from '../controllers/submissionController.js'
 import { uploadSubmissionFiles } from '../config/upload.js'
 import { requireAdminAuth } from '../middlewares/authMiddleware.js'
@@ -32,6 +33,9 @@ router.get('/:id/view/:fileType', requireAdminAuth, viewSubmissionFile)
 
 // Route: Download uploaded file (Protected Admin endpoint)
 router.get('/:id/download/:fileType', requireAdminAuth, downloadSubmissionFile)
+
+// Route: Delete submission and deliverables (Protected Admin endpoint)
+router.delete('/:id', requireAdminAuth, deleteSubmission)
 
 export default router
 
