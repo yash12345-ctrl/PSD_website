@@ -682,17 +682,17 @@
     flex: 1;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     min-height: calc(100dvh - 52px);
     min-height: calc(100vh - 52px);
-    padding: 16px 0 max(20px, env(safe-area-inset-bottom));
+    padding: 20px 0 max(24px, env(safe-area-inset-bottom));
     box-sizing: border-box;
   }
 
   .hero-grid {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
     width: 100%;
     box-sizing: border-box;
     gap: 16px;
@@ -701,14 +701,13 @@
   .hero-copy {
     display: flex;
     flex-direction: column;
-    flex-shrink: 0;
   }
 
   .hero-eyebrow {
     font-size: clamp(11px, 3.2vw, 12.5px);
     padding: 5px 12px 5px 9px;
     gap: 6px;
-    margin: 0 0 14px;
+    margin: 0 0 12px;
     align-self: flex-start;
   }
 
@@ -718,20 +717,20 @@
   }
 
   .hero-title {
-    font-size: clamp(32px, 8.5vw, 40px);
+    font-size: clamp(30px, 8vw, 38px);
     line-height: 1.08;
     margin-bottom: 12px;
   }
 
   .hero-lead {
     font-size: 15px;
-    line-height: 1.46;
-    margin-bottom: 20px;
+    line-height: 1.45;
+    margin-bottom: 18px;
   }
 
   .hero-actions {
     width: 100%;
-    margin-bottom: 4px;
+    margin-bottom: 0;
   }
 
   .hero-actions .btn-primary {
@@ -743,7 +742,7 @@
   }
 
   .status-card {
-    margin-top: auto;
+    margin-top: 4px;
     padding: 18px 16px;
     border-radius: 20px;
     width: 100%;
@@ -776,7 +775,7 @@
   }
 
   .hero {
-    padding: 12px 0 max(16px, env(safe-area-inset-bottom));
+    padding: 16px 0 max(18px, env(safe-area-inset-bottom));
   }
 
   .hero-grid {
@@ -796,14 +795,14 @@
   }
 
   .hero-title {
-    font-size: 28px;
+    font-size: 27px;
     margin-bottom: 10px;
   }
 
   .hero-lead {
-    font-size: 14px;
-    line-height: 1.42;
-    margin-bottom: 16px;
+    font-size: 13.5px;
+    line-height: 1.4;
+    margin-bottom: 14px;
   }
 
   .hero-actions .btn-primary {
@@ -812,7 +811,8 @@
   }
 
   .status-card {
-    padding: 15px 13px;
+    margin-top: 2px;
+    padding: 14px 12px;
     border-radius: 18px;
   }
 
@@ -821,15 +821,15 @@
   }
 
   .status-count strong {
-    font-size: 34px;
+    font-size: 32px;
   }
 
   .status-count-unit {
-    font-size: 13.5px;
+    font-size: 13px;
   }
 
   .status-count-timer {
-    font-size: 10.5px;
+    font-size: 10px;
     padding: 2px 5px;
   }
 }
