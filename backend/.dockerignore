@@ -1,0 +1,9 @@
+node_modules
+npm-debug.log
+.env
+.env*
+uploads/assignments/*
+uploads/reports/*
+!uploads/.gitkeep
+!uploads/assignments/.gitkeep
+!uploads/reports/.gitkeep
