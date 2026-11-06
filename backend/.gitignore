@@ -2,10 +2,8 @@
 node_modules/
 
 # Secrets & Environment variables
-.env
-.env*.local
-*.env
-!.env.example
+.env*
+*.env*
 
 # Uploaded student deliverables
 uploads/assignments/*

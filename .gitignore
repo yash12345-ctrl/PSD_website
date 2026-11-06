@@ -9,15 +9,9 @@ node_modules/
 # ==========================================
 # Environment Variables & Secrets (CRITICAL)
 # ==========================================
-.env
-.env.local
-.env.*.local
-backend/.env
-backend/.env.*.local
-*.env
-# Keep template examples tracked
-!.env.example
-!backend/.env.example
+.env*
+*.env*
+backend/.env*
 
 # ==========================================
 # Production Builds & Compiled Assets
